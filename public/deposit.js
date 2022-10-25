@@ -1,4 +1,4 @@
-function deposit(){
+function Deposit(){
   return (
     <Card
     bgcolor="dark"
@@ -6,10 +6,12 @@ function deposit(){
      header="Make a Deposite"
      
      text=""
-     body={<button type="button" class="btn btn-primary" data-toggle="button" aria-pressed="false" autocomplete="off">
+     body={
+      <>
+     <button type="button" class="btn btn-primary" data-toggle="button" aria-pressed="false" autocomplete="off">
     Deposite
    </button>
-
+</>
      }
 
     /> 
