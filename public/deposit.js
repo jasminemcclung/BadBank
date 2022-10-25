@@ -8,7 +8,7 @@ function Deposit(){
      text=""
      body={
       <>
-     <button type="button" class="btn btn-primary" data-toggle="button" aria-pressed="false" autocomplete="off">
+     <button type="button" class="btn btn-light" data-toggle="button" aria-pressed="false" autocomplete="off">
     Deposite
    </button>
 </>
