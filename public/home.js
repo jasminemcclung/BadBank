@@ -1,7 +1,8 @@
 function Home(){
   return (
     <Card
-      txtcolor= "black"
+      txtcolor= "dark"
+      bgcolor="light"
       header="Banking Home"
       title="Welcome to the Bank"
       text="You can move around using the navigation bar."

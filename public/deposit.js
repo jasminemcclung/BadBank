@@ -1,13 +1,16 @@
 function Deposit(){
   return (
     <Card
-     txtcolor="dark"
+    bgcolor="dark"
+     txtcolor="light"
      header="deposit"
      title= "Make a deposit"
      text=""
-     body={""
+     
 
-     }
+     
+
+     
 
     />  )
 }
