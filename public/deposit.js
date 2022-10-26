@@ -1,24 +1,41 @@
-function Deposit(){
-  return (
-    <Card
-    bgcolor="dark"
-     txtcolor="light"
-     header="Make a Deposite"
-     
-     text=""
-     body={
-      <>
-     <button type="button" class="btn btn-light" data-toggle="button" aria-pressed="false" autocomplete="off">
-    Deposite
-   </button>
-</>
-     }
+function Deposit() {
+  const ctx = React.useContext(UserContext); 
+  const [status, setStatus]     = React.useState(true);
 
-    /> 
-  )
-}
-function Balance(){
+  function depositAmount() {
+      if (ctx.user!=='') { 
+      setStatus(`$${ctx.balance} deposit successful!`);
+      setTimeout(() => setStatus(''),2000);
+
+      ctx.balance.toString();
+      const url = `/account/deposit/${ctx.user}/${ctx.balance}`;
+      (async () => {
+          var res = await fetch(url);
+          var data = await res.json();
+          console.log(data);
+      })();
+      } else {
+          setStatus('Login to make a deposit');
+          setTimeout(() => setStatus(''),3000);
+      }
+  }
+
   return (
-    <h1>Balance</h1>
+      <Card
+          bgcolor="dark"
+          header="Deposit"
+          text=""
+          status={status}
+          body={
+              <>
+              <CardForm
+                  showName="none"
+                  showPassword="none"
+                  showEmail="none"
+              />
+              {<button type="submit" className="btn btn-light" onClick={depositAmount}>Deposit</button>}
+              </>
+          }
+      />
   )
 }

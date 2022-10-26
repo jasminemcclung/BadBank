@@ -1,78 +1,39 @@
-function Balance(props){
-    const [user, setUser]     = React.useState('');
-    const [show, setShow]     = React.useState(true);
-    const [status, setStatus] = React.useState('');  
-    // const [balance, setBalance] = React.useState(ctx.user.balance);
-  
-    return (
-      <Card
-        bgcolor='info'
-        header='Balance'
-        status={status}
-        body={
-          show ? (
-            <>
-              <BalanceForm
-                user={props.user}
-                setShow={setShow}
-                setStatus={setStatus}
-                setBalance={setBalance}
-              />
-            </>
-          ) : (
-            <>
-              {' '}
-              <BalanceMsg setShow={setShow} setStatus={setStatus} />
-              <h5>Your Current Balance is ${balance}</h5>
-            </>
-          )
-        }
-      />
-    )
-  }
-    // return (
-    // //   <Card
-    // //     bgcolor="info"
-    // //     header="Balance"
-    // //     status={status}
-    // //     body={show ?
-    // //       <BalanceForm setShow={setShow} setStatus={setStatus}/> :
-    // //       <BalanceMsg setShow={setShow}/>}
-    // //   />
-    // )
-  
-  
-    function BalanceForm(props) {
-      const ctx = React.useContext(UserContext);  
-      const email = ctx.user.email;
-      const [balance, setBalance] = React.useState(0);  
-    
-      fetch(`/account/findOne/${email}`)
-      .then(response => response.text())
-      .then(text => {
-          try {
-              const data = JSON.parse(text);
-              setBalance(data.balance);
-          } catch(err) {
-              console.log('err:', text);
-          }
+function Balance() {
+  const ctx = React.useContext(UserContext); 
+  const [data, setData] = React.useState('');
+  const [status, setStatus]     = React.useState(true);
+
+  function fetchAccount() {
+      if (ctx.user!=='') { 
+      fetch(`/account/balance/${ctx.email}`)
+      .then(response => response.json())
+      .then(data => {
+              console.log(data);
+              setData('$' + data[0].balance);
       });
-    
-      return (<>
-        <h5>Your current balance is ${parseFloat(balance).toFixed(2)}</h5>
-  
-      Email<br/>
-      <input type="input" 
-        className="form-control" 
-        placeholder="Enter email" 
-        value={email} 
-        onChange={e => setEmail(e.currentTarget.value)}/><br/>
-  
-      <button type="submit" 
-        className="btn btn-light" 
-        onClick={handle}>
-          Check Balance
-      </button>
-  
-    </>);
+      } else {
+          setStatus('Login to see account balance');
+          setTimeout(() => setStatus(''),3000);
+      }
   }
+
+  return (
+      <Card
+          bgcolor="dark"
+          header="Balance"
+          text={data}
+          status={status}
+          body={
+              <>
+              <CardForm
+                  showName="none"
+                  showPassword="none"
+                  showAmount="none"
+                  showEmail="none"              
+              />
+              {<button type="submit" className="btn btn-light" onClick={fetchAccount}>See Balance</button>}
+              </>
+          }
+      />
+  )
+}
