@@ -8,18 +8,48 @@ function CreateAccount(){
 
   function validate(field, label){
       if (!field) {
-        setStatus('Error: ' + label);
-        setTimeout(() => setStatus(''),3000);
+      setStatus('Error: ' + label);
+      setTimeout(() => setStatus(''),3000);
         return false;
       }
       return true;
   }
+
+function regName(){
+  const reqName = /^[a-zA-Z]+ [a-zA-Z]+$/
+if (reqName.test(name)){
+  return true;
+}
+setStatus(`Name must be composed of firstname and lastname`);
+return false;
+}
+
+function emailFormula() {
+ const reqFormula = /^([a-z\d\.-]+)@([a-z\d-]+)\.([a-z]{2,8})(\.[a-z]{2,8})?$/
+if (reqFormula.test(email)){
+  return true;
+}
+setStatus(`Email must be valid address`);
+return false;
+}
+
+  function passwordEffective() {
+    const minEffective = 10;
+    if (password.length >= minEffective) {
+        return true;
+    }
+    setStatus(`Password must contain ${minEffective} characters or more`);
+    return false;
+}
 
   function handleCreate(){
     console.log(name,email,password);
     if (!validate(name,     'name'))     return;
     if (!validate(email,    'email'))    return;
     if (!validate(password, 'password')) return;
+    if (!regName()) return;
+    if (!emailFormula()) return;
+    if (!passwordEffective()) return;
     ctx.users.push({name,email,password,balance:100});
     setShow(false);
   }    
@@ -34,11 +64,11 @@ function CreateAccount(){
   return (
     <Card
       bgcolor="dark"
-      header="Create Account"
+      header="Create A BadBank Account"
       status={status}
       body={show ? (  
               <>
-              Name<br/>
+              Full Name<br/>
               <input type="input" className="form-control" id="name" placeholder="Enter name" value={name} onChange={e => setName(e.currentTarget.value)} /><br/>
               Email address<br/>
               <input type="input" className="form-control" id="email" placeholder="Enter email" value={email} onChange={e => setEmail(e.currentTarget.value)}/><br/>

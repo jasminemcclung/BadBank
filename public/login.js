@@ -1,95 +1,141 @@
-function Login(){
-  const [show, setShow]     = React.useState(true);
-  const [status, setStatus] = React.useState('');   
-  const [user, setUser]     = React.useState('');
-  const UserContext = React.createContext(null);
-  const ctx = React.useContext(UserContext);
-
-
-
-  return (
-    <Card
-      bgcolor="dark"
-      header="Login"
-      status={status}
-      body={show ? 
-        <LoginForm setShow={setShow} setStatus={setStatus} setUser={setUser}/> :
-        <LoginMsg setShow={setShow} setStatus={setStatus} user={user}/>}
-    />
-  ) 
-}
-
-   function LoginForm(props){
-    const [email, setEmail]       = React.useState('');
-    const [password, setPassword] = React.useState('');
-    const ctx = React.useContext(UserContext);
-    const user = ctx.user;
-    
+function Login() {
+	const [show, setShow]                     = React.useState(true);
+	const [status, setStatus]                 = React.useState('');
+	const [name, setName]                     = React.useState('');
+	const [email, setEmail]       			  = React.useState('');
+	const [currentAccount, setCurrentAccount] = React.useState('');
+	const [emailValue, setEmailValue]             = React.useState('');
+	const [passwordValue, setPasswordValue]       = React.useState('');
+    const [buttonStatus, setButtonStatus]     = React.useState(true);
+	const ctx = React.useContext(UserContext);
   
-    function handle(){
-      console.log(email, password);
-      
-      firebase
-      .auth()
-      .signInWithEmailAndPassword(email, password)
-      .then((userCredential) => {
-        const user = userCredential.user;
-        console.log(`user: ${user.email}`);
-        props.setUser(user);
-        props.setStatus("");
-        props.setShow(false);
-        ctx.user = user;
-        // ctx.user.name = user.name
-        window.location.replace('/#/alldata');
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.log("one");
-        props.setStatus("fail!");
-      });  
+	if (show) {
+	  for (const { name, email, loggedin } of ctx.users) {
+		if (loggedin) {
+		  setShow(false);
+		  setEmail(email);
+		  setName(name);
+  
+		  return;
+		}
+	  }
+	}
+  
+    function handleChange(e){
+        if(e.target.value === null){
+            setButtonStatus(true);
+            setPasswordValue(e.currentTarget.value);
+        } else {
+            setButtonStatus(false);
+            setPasswordValue(e.currentTarget.value);
+        }
     }
-  
-         return (<>
-  
-      Email<br/>
-      <input type="input" 
-        className="form-control" 
-        placeholder="Enter email" 
-        value={email} 
-        onChange={e => setEmail(e.currentTarget.value)}/><br/>
-  
-      Password<br/>
 
+	function validate(field, label) {
+	  if (!field) {
+		setStatus('Error: Missing ' + label);
+		setTimeout(() => setStatus(''), 3000);
+		return false;
+	  }
+	  return true;
+	}
 
-      <input type="password" 
-        className="form-control" 
-        placeholder="Enter password" 
-        value={password} 
-        onChange={e => setPassword(e.currentTarget.value)}/><br/>
+	function handleLogin() {
+	  if (!validate(emailValue,    'email')) return;
+	  if (!validate(passwordValue, 'password')) return;
+	  let tracker = false;
   
-  <button type="submit" className="btn btn-light" onClick={handle}>Login</button><br></br><br></br>
-      
-      
-
-      
-     <p className="forgot-password text-right"><br></br><br></br>
-         New? <a href="#/CreateAccount/">CreateAccount</a>
-      </p>
-     
-    </>);
-    
-    function LoginMsg(props){
-      const currentUser = props.user.email;
-      window.alert("You are logged in!");
-      // window.location.replace('/#/logout');
-      return(<>
-        <h5>{`Welcome ${currentUser}!`}</h5>
-      </>);
+	  for (const { email, password } of ctx.users) {
+		if (emailValue === email && passwordValue === password) {
+		  for (var i = 0, length = ctx.users.length; i < length; i++) {
+			if (ctx.users[i].email === email) {
+			  ctx.users[i].loggedin = true;
+			  tracker = true;
+			}
+		  }
+		}
+	  }
   
+	  if (tracker) {
+		setShow(false);
+		setCurrentAccount(emailValue);
+	  } else {
+		setStatus('Invalid login. Please create an account');
+		setTimeout(() => setStatus(''), 6000);
+	  }
+	}
+  
+	function logout() {
+	  for (var i = 0, length = ctx.users.length; i < length; i++) {
+		ctx.users[i].loggedin = false;
+	  }
+	  setShow(true);
+	}
+  
+	return (
+	  <Card
+		bgcolor="dark"
+		txtcolor="light"
+		header="Login"
+		status={status}
+		body={
+		  show ? (
+			<>
+			  <br />
+			  Email
+			  <br />
+			  <input
+				type="input"
+				className="form-control"
+				id="email"
+				placeholder="Enter Email"
+				value={emailValue}
+				onChange={(e) => setEmailValue(e.currentTarget.value)}
+			  />
+			  <br />
+			  Password
+			  <br />
+			  <input
+				type="password"
+				className="form-control"
+				id="password"
+				placeholder="Enter Password"
+				value={passwordValue}
+				onChange={handleChange}
+			  />
+			  <br />
+			  <button
+				type="submit"
+				className="btn btn-light"
+                disabled={buttonStatus}
+				onClick={handleLogin}
+			  >
+				Login
+			  </button>
+			  <br />
+			  <br />
+			</>
+		  ) : (
+			<>
+			  <h5> {`Welcome back ${currentAccount}! `} </h5>
+			  <br />
+			  Check your account information {' '}
+			  <a href="#/alldata" className="text-light">
+				here
+			  </a>!
+			 
+			  <br />
+			  <br />
+			  <button
+				type="submit"
+				className="btn btn-light"
+				onClick={logout}
+			  >
+				Logout
+			  </button>
+			</>
+		  )
+		}
+	  />
+	);
   }
-  
-
-
-}
-

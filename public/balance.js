@@ -1,39 +1,85 @@
-function Balance() {
-  const ctx = React.useContext(UserContext); 
-  const [data, setData] = React.useState('');
-  const [status, setStatus]     = React.useState(true);
 
-  function fetchAccount() {
-      if (ctx.user!=='') { 
-      fetch(`/account/balance/${ctx.email}`)
-      .then(response => response.json())
-      .then(data => {
-              console.log(data);
-              setData('$' + data[0].balance);
-      });
-      } else {
-          setStatus('Login to see account balance');
-          setTimeout(() => setStatus(''),3000);
-      }
-  }
-
-  return (
+function Balance(props) {
+    const [show, setShow] = React.useState(true)
+    const [status, setStatus] = React.useState('')
+    const [balance, setBalance] = React.useState('')
+  
+  
+    return (
       <Card
-          bgcolor="dark"
-          header="Balance"
-          text={data}
-          status={status}
-          body={
-              <>
-              <CardForm
-                  showName="none"
-                  showPassword="none"
-                  showAmount="none"
-                  showEmail="none"              
+        bgcolor='dark'
+        header='Balance'
+        status={status}
+        body={
+          show ? (
+            <>
+              <BalanceForm
+                user={props.user}
+                setShow={setShow}
+                setStatus={setStatus}
+                setBalance={setBalance}
               />
-              {<button type="submit" className="btn btn-light" onClick={fetchAccount}>See Balance</button>}
-              </>
-          }
+            </>
+          ) : (
+            <>
+              {' '}
+              <BalanceMsg setShow={setShow} setStatus={setStatus} />
+              <h5>Your Current Balance is ${balance}</h5>
+            </>
+          )
+        }
       />
-  )
-}
+    )
+  }
+  
+  function BalanceMsg(props) {
+    return (
+      <>
+        <h5>Success</h5>
+        <button
+          type='submit'
+          className='btn btn-light'
+          onClick={() => {
+            props.setShow(true)
+            props.setStatus('')
+          }}
+        >
+          Check balance again
+        </button>
+      </>
+    )
+  }
+  
+  function BalanceForm(props) {
+    // const [email, setEmail]   = React.useState('');
+  
+    function handle() {
+      fetch(`/account/findOne/${props.user.email}`)
+        .then(response => response.text())
+        .then(text => {
+          try {
+            const data = JSON.parse(text)
+            props.setStatus(data.balance)
+            props.setShow(false)
+            props.setBalance(data.balance)
+            console.log('JSON:', data)
+          } catch (err) {
+            props.setStatus(text)
+            console.log('err:', text)
+          }
+        })
+    }
+  
+    //tried changing email to user. I think I need to adapt to non form so no input. How????
+  
+    return (
+      <>
+        User
+        <br />
+        <p>{props.user.email}</p>
+        <button type='submit' className='btn btn-light' onClick={handle}>
+          Check Balance
+        </button>
+      </>
+    )
+  }
